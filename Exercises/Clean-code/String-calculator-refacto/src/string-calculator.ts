@@ -1,56 +1,45 @@
-export function add(numbers: string): number {
-  if (numbers === '') return 0;
-  if (numbers.startsWith('//')) {
-    let deli = numbers.charAt(2);
-    let body = numbers.substring(4);
-    if (numbers.charAt(2) === '[') {
-      deli = numbers.substring(3, numbers.indexOf(']'));
-      body = numbers.substring(numbers.indexOf(']') + 2);
-    }
-    if (numbers.charAt(2) === '[' && numbers.indexOf('][') !== -1) {
-      const h = numbers.substring(2, numbers.indexOf(']\n') + 1);
-      body = numbers.substring(numbers.indexOf(']\n') + 2);
-      const declared = h.substring(1, h.length - 1).split('][');
-      for (const one of declared) {
-        body = body.split(one).join(',');
-      }
-      deli = ',';
-    }
-    const parts = body.split(deli);
-    let total = 0;
-    const negatives = [];
-    for (const part of parts) {
-      if (Number(part) < 0) {
-        negatives.push(Number(part));
-      }
-      if (Number(part) <= 1000) {
-        total += Number(part);
-      }
-    }
-    if (negatives.length > 0) {
-      throw new Error('negatives not allowed: ' + negatives.join(', '));
-    }
-    return total;
+export function add(nombres: string): number {
+  const { partieNombres, delimiteur } = analyser(nombres);
+  const { negatifs, somme } = additionner(partieNombres, delimiteur);
+  if (negatifs.length > 0) {
+    throw new Error('les négatifs ne sont pas autorisés: ' + negatifs.join(', '));
   }
-  if (numbers.includes(',') || numbers.includes('\n')) {
-    const pList = numbers.split(',');
-    let t = 0;
-    const negatives = [];
-    for (const p of pList) {
-      const subParts = p.split('\n');
-      for (const subPart of subParts) {
-        if (Number(subPart) < 0) {
-          negatives.push(Number(subPart));
-        }
-        if (Number(subPart) <= 1000) {
-          t += Number(subPart);
-        }
-      }
-    }
-    if (negatives.length > 0) {
-      throw new Error('negatives not allowed: ' + negatives.join(', '));
-    }
-    return t;
+  return somme;
+}
+
+function analyser(nombres: string): { partieNombres: string; delimiteur: string } {
+  if (!nombres.startsWith('//')) {
+    return { partieNombres: nombres.replaceAll('\n', ','), delimiteur: ',' };
   }
-  return Number(numbers);
+  if (nombres.charAt(2) === '[' && nombres.indexOf('][') !== -1) {
+    const enTeteDelimiteurs = nombres.substring(2, nombres.indexOf(']\n') + 1);
+    let partieNombres = nombres.substring(nombres.indexOf(']\n') + 2);
+    const delimiteursDeclares = enTeteDelimiteurs.substring(1, enTeteDelimiteurs.length - 1).split('][');
+    for (const delimiteurDeclare of delimiteursDeclares) {
+      partieNombres = partieNombres.split(delimiteurDeclare).join(',');
+    }
+    return { partieNombres, delimiteur: ',' };
+  }
+  if (nombres.charAt(2) === '[') {
+    return {
+      delimiteur: nombres.substring(3, nombres.indexOf(']')),
+      partieNombres: nombres.substring(nombres.indexOf(']') + 2),
+    };
+  }
+  return { delimiteur: nombres.charAt(2), partieNombres: nombres.substring(4) };
+}
+
+function additionner(partieNombres: string, delimiteur: string) {
+  const morceaux = partieNombres.split(delimiteur);
+  let somme = 0;
+  const negatifs = [];
+  for (const morceau of morceaux) {
+    if (Number(morceau) < 0) {
+      negatifs.push(Number(morceau));
+    }
+    if (Number(morceau) <= 1000) {
+      somme += Number(morceau);
+    }
+  }
+  return { negatifs, somme };
 }

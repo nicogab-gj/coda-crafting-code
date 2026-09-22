@@ -27,11 +27,11 @@ describe('add', () => {
   });
 
   it('throws listing every negative number found', () => {
-    expect(() => add('1,-2,-5')).toThrow('negatives not allowed: -2, -5');
+    expect(() => add('1,-2,-5')).toThrow('les négatifs ne sont pas autorisés: -2, -5');
   });
 
   it('throws when a negative number is found even with custom delimiters', () => {
-    expect(() => add('//;\n1;-2')).toThrow('negatives not allowed: -2');
+    expect(() => add('//;\n1;-2')).toThrow('les négatifs ne sont pas autorisés: -2');
   });
 
   it('ignores numbers above 1000', () => {
