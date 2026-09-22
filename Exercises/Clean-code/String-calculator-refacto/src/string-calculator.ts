@@ -3,27 +3,9 @@ export function addPositifNumberFromString(numbers_to_string: string): number {
   if (numbers_to_string === '') return 0;
 
   if (numbers_to_string.startsWith('//')) {
-    let deli = numbers_to_string.charAt(2);
-    let body = numbers_to_string.substring(4);
+    
 
-    if (numbers_to_string.charAt(2) === '[') {
-      deli = numbers_to_string.substring(3, numbers_to_string.indexOf(']'));
-      body = numbers_to_string.substring(numbers_to_string.indexOf(']') + 2);
-    }
-
-    if (numbers_to_string.charAt(2) === '[' && numbers_to_string.indexOf('][') !== -1) {
-      const h = numbers_to_string.substring(2, numbers_to_string.indexOf(']\n') + 1);
-      body = numbers_to_string.substring(numbers_to_string.indexOf(']\n') + 2);
-      const declared = h.substring(1, h.length - 1).split('][');
-
-      for (const one of declared) {
-        body = body.split(one).join(',');
-      }
-
-      deli = ',';
-    }
-
-    const numbers_strings = body.split(deli);
+    const numbers_strings = makeNumberStringListFromString(numbers_to_string);
     let total = 0;
     
     throwNegativeErrorFromList(numbers_strings)
@@ -111,10 +93,13 @@ const addNumberFromStringsList = (numbers_list:string[]) => {
 }
 
 
-const akeNumberStringListFromString = (numbers_string:string) => {
+const makeNumberStringListFromString = (numbers_to_string:string) => {
+  let deli:string;
+  let body:string[];
+
   if (numbers_to_string.startsWith('//')) {
-      let deli = numbers_to_string.charAt(2);
-      let body = numbers_to_string.substring(4);
+    deli = numbers_to_string.charAt(2);
+    body = numbers_to_string.substring(4);
 
     if (numbers_to_string.charAt(2) === '[') {
       deli = numbers_to_string.substring(3, numbers_to_string.indexOf(']'));
@@ -133,4 +118,6 @@ const akeNumberStringListFromString = (numbers_string:string) => {
       deli = ',';
     }
   }
+
+  return body.split(deli);
 }
