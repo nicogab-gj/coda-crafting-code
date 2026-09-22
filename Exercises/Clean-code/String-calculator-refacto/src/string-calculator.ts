@@ -12,7 +12,7 @@ function getArrayOfNumbers(numbers: string) {
 
 function getCleanedArray(numbers: string) {
   if (null !== getNegativeArray(numbers)) {
-    return getArrayOfNumbers(numbers)?.filter((el) => !getNegativeArray(numbers)?.includes(el));
+    throw new Error('negatives not allowed: ' + getNegativeArray(numbers)?.join(', '));
   }
 
   if (null !== getNumberAbove1000(numbers)) {
@@ -29,8 +29,6 @@ function getResult(numbers: string):number | undefined {
 
 export function summedNumberInString(numbers: string): number|undefined {
   if (numbers === '') return 0;
-
-  if (null !== getNegativeArray(numbers)) throw new Error('negatives not allowed: ' + getNegativeArray(numbers)?.join(', '));
 
   return getResult(numbers);
 }
