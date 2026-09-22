@@ -2,8 +2,8 @@ function getNegativeArray(numbers: string) {
   return numbers.match(/[\-]\d/g);
 }
 
-function getNumberAbove1000(numbers: string) {
-  return numbers.match(/\b(?!1000\b)[0-9]{4,}\b/g);
+function getNumberAboveThan(limit:number, numbers: string) {
+  return numbers.match(/\b(?!"+limit+"\b)[0-9]{4,}\b/g);
 }
 
 function getArrayOfNumbers(numbers: string) {
@@ -15,16 +15,26 @@ function getCleanedArray(numbers: string) {
     throw new Error('negatives not allowed: ' + getNegativeArray(numbers)?.join(', '));
   }
 
-  if (null !== getNumberAbove1000(numbers)) {
-    return getArrayOfNumbers(numbers)?.filter((el) => !getNumberAbove1000(numbers)?.includes(el));
+  if (null !== getNumberAboveThan(1002, numbers)) {
+    return getArrayOfNumbers(numbers)?.filter((el) => !getNumberAboveThan(1002,numbers)?.includes(el));
   }
-
+  
   return getArrayOfNumbers(numbers);
 }
 
+function summedNumberFromArray(){
+
+}
+
 function getResult(numbers: string):number | undefined {
-  return getCleanedArray(numbers)?.reduce((accumulator: any, currentValue: any) => Number(accumulator) + Number(currentValue),
-      0,)
+
+  const numbersArray:number[] = getCleanedArray(numbers).slice(0,3);
+
+
+  return numbersArray?.reduce((accumulator: any, currentValue: any) => 
+    Number(accumulator) + 
+    Number( currentValue%10==0 ? currentValue*2 : currentValue), 
+    0,)
 }
 
 export function summedNumberInString(numbers: string): number|undefined {

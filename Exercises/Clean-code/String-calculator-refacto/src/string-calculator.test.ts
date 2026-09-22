@@ -15,7 +15,7 @@ describe('summedNumberInString', () => {
   });
 
   it('sums any amount of numbers', () => {
-    expect(summedNumberInString('1,2,3,4,5')).toBe(15);
+    expect(summedNumberInString('1,2,3')).toBe(6);
   });
 
   it('accepts newlines as delimiters too', () => {
@@ -34,12 +34,12 @@ describe('summedNumberInString', () => {
     expect(() => summedNumberInString('//;\n1;-2')).toThrow('negatives not allowed: -2');
   });
 
-  it('ignores numbers above 1000', () => {
-    expect(summedNumberInString('2,1001')).toBe(2);
+  it('ignores numbers above 1002', () => {
+    expect(summedNumberInString('2,1003')).toBe(2);
   });
 
-  it('still ignores numbers above 1000 even with custom delimiters', () => {
-    expect(summedNumberInString('//[***]\n2***1001')).toBe(2);
+  it('still ignores numbers above 1003 even with custom delimiters', () => {
+    expect(summedNumberInString('//[***]\n2***1003')).toBe(2);
   });
 
   it('accepts a delimiter of any length', () => {
@@ -48,5 +48,13 @@ describe('summedNumberInString', () => {
 
   it('accepts several declared delimiters', () => {
     expect(summedNumberInString('//[*][%]\n1*2%3')).toBe(6);
+  });
+
+  it('Multiple of 10 ar doubled in the sum', () => {
+    expect(summedNumberInString('1,10,20')).toBe(61);
+  });
+
+  it('Multiple of 10 ar doubled in the sum', () => {
+    expect(summedNumberInString('2,9,9,1')).toBe(20);
   });
 });
