@@ -1,56 +1,66 @@
-export function add(numbers: string): number {
-  if (numbers === '') return 0;
-  if (numbers.startsWith('//')) {
-    let deli = numbers.charAt(2);
-    let body = numbers.substring(4);
-    if (numbers.charAt(2) === '[') {
-      deli = numbers.substring(3, numbers.indexOf(']'));
-      body = numbers.substring(numbers.indexOf(']') + 2);
+export function stringCalculator(input: string): number {
+  if (input === "") return 0;
+
+  if (hasDelimiters(input)) {
+    let expression = { Delimiters: input.charAt(2), Body: input.substring(4) };
+
+    if (hasSeveralCustomDelimiters(input)) {
+      const extractedDelimiters = extractCustomDelimiters(input);
+      expression.Delimiters = extractedDelimiters.inputDelimiters;
+      expression.Body = extractedDelimiters.inputBody;
+    } else if (hasOneCustomDelimiters(input)) {
+      expression.Delimiters = input.substring(3, input.indexOf("]"));
+      expression.Body = input.substring(input.indexOf("]") + 2);
     }
-    if (numbers.charAt(2) === '[' && numbers.indexOf('][') !== -1) {
-      const h = numbers.substring(2, numbers.indexOf(']\n') + 1);
-      body = numbers.substring(numbers.indexOf(']\n') + 2);
-      const declared = h.substring(1, h.length - 1).split('][');
-      for (const one of declared) {
-        body = body.split(one).join(',');
-      }
-      deli = ',';
-    }
-    const parts = body.split(deli);
-    let total = 0;
-    const negatives = [];
-    for (const part of parts) {
-      if (Number(part) < 0) {
-        negatives.push(Number(part));
-      }
-      if (Number(part) <= 1000) {
-        total += Number(part);
-      }
-    }
-    if (negatives.length > 0) {
-      throw new Error('negatives not allowed: ' + negatives.join(', '));
-    }
-    return total;
+    const bodyTable = expression.Body.split(expression.Delimiters);
+    return respectRules(bodyTable);
   }
-  if (numbers.includes(',') || numbers.includes('\n')) {
-    const pList = numbers.split(',');
-    let t = 0;
-    const negatives = [];
-    for (const p of pList) {
-      const subParts = p.split('\n');
-      for (const subPart of subParts) {
-        if (Number(subPart) < 0) {
-          negatives.push(Number(subPart));
-        }
-        if (Number(subPart) <= 1000) {
-          t += Number(subPart);
-        }
-      }
-    }
-    if (negatives.length > 0) {
-      throw new Error('negatives not allowed: ' + negatives.join(', '));
-    }
-    return t;
+
+  if (input.includes(",") || input.includes("\n")) {
+    const bodyTable = input.split(/[,\n]/);
+    return respectRules(bodyTable);
   }
-  return Number(numbers);
+  return Number(input);
+}
+
+function hasDelimiters(input: string) {
+  return input.startsWith("//");
+}
+
+function respectRules(subParts: string[]) {
+  let sommeNumber = 0;
+  const negativesTable = [];
+
+  for (const subPart of subParts) {
+    if (Number(subPart) < 0) {
+      negativesTable.push(Number(subPart));
+    }
+    if (Number(subPart) <= 1000) {
+      sommeNumber += Number(subPart);
+    }
+  }
+  if (negativesTable.length > 0) {
+    throw new Error("negatives not allowed: " + negativesTable.join(", "));
+  }
+  return sommeNumber;
+}
+
+function extractCustomDelimiters(input: string) {
+  const delimitersExpression = input.substring(2, input.indexOf("]\n") + 1);
+  let inputBody = input.substring(input.indexOf("]\n") + 2);
+  const delimitersTable = delimitersExpression
+    .substring(1, delimitersExpression.length - 1)
+    .split("][");
+  for (const delimiter of delimitersTable) {
+    inputBody = inputBody.split(delimiter).join(",");
+  }
+  return { inputDelimiters: ",", inputBody };
+}
+
+function hasSeveralCustomDelimiters(input: string) {
+  return hasOneCustomDelimiters(input) && input.includes("][");
+}
+
+function hasOneCustomDelimiters(input: string) {
+  return input.charAt(2) === "[";
 }
