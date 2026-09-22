@@ -1,56 +1,136 @@
-export function add(numbers: string): number {
-  if (numbers === '') return 0;
-  if (numbers.startsWith('//')) {
-    let deli = numbers.charAt(2);
-    let body = numbers.substring(4);
-    if (numbers.charAt(2) === '[') {
-      deli = numbers.substring(3, numbers.indexOf(']'));
-      body = numbers.substring(numbers.indexOf(']') + 2);
+export function addPositifNumberFromString(numbers_to_string: string): number {
+
+  if (numbers_to_string === '') return 0;
+
+  if (numbers_to_string.startsWith('//')) {
+    let deli = numbers_to_string.charAt(2);
+    let body = numbers_to_string.substring(4);
+
+    if (numbers_to_string.charAt(2) === '[') {
+      deli = numbers_to_string.substring(3, numbers_to_string.indexOf(']'));
+      body = numbers_to_string.substring(numbers_to_string.indexOf(']') + 2);
     }
-    if (numbers.charAt(2) === '[' && numbers.indexOf('][') !== -1) {
-      const h = numbers.substring(2, numbers.indexOf(']\n') + 1);
-      body = numbers.substring(numbers.indexOf(']\n') + 2);
+
+    if (numbers_to_string.charAt(2) === '[' && numbers_to_string.indexOf('][') !== -1) {
+      const h = numbers_to_string.substring(2, numbers_to_string.indexOf(']\n') + 1);
+      body = numbers_to_string.substring(numbers_to_string.indexOf(']\n') + 2);
       const declared = h.substring(1, h.length - 1).split('][');
+
       for (const one of declared) {
         body = body.split(one).join(',');
       }
+
       deli = ',';
     }
-    const parts = body.split(deli);
+
+    const numbers_strings = body.split(deli);
     let total = 0;
-    const negatives = [];
-    for (const part of parts) {
-      if (Number(part) < 0) {
-        negatives.push(Number(part));
-      }
-      if (Number(part) <= 1000) {
-        total += Number(part);
-      }
-    }
-    if (negatives.length > 0) {
-      throw new Error('negatives not allowed: ' + negatives.join(', '));
-    }
+    
+    throwNegativeErrorFromList(numbers_strings)
+
+    const filtered_numbers_strings = filterNumbersInRange(0, 1000, numbers_strings);
+    total = addNumberFromStringsList(filtered_numbers_strings);
+
     return total;
   }
-  if (numbers.includes(',') || numbers.includes('\n')) {
-    const pList = numbers.split(',');
+
+  if (numbers_to_string.includes(',') || numbers_to_string.includes('\n')) {
+    const pList = numbers_to_string.split(',');
     let t = 0;
     const negatives = [];
+
     for (const p of pList) {
       const subParts = p.split('\n');
+
       for (const subPart of subParts) {
+
         if (Number(subPart) < 0) {
           negatives.push(Number(subPart));
         }
+
         if (Number(subPart) <= 1000) {
           t += Number(subPart);
         }
+
       }
     }
+
     if (negatives.length > 0) {
       throw new Error('negatives not allowed: ' + negatives.join(', '));
     }
-    return t;
+
+    return t; 
   }
-  return Number(numbers);
+  
+  return Number(numbers_to_string);
+}
+
+
+const filterNumbersGreaterThan = (greater_limit:number, numbers_list:string[]) => {
+  return numbers_list.filter(n => n < greater_limit);
+} 
+
+
+const filterNumbersLowerThan = (lower_limit:number, numbers_list:string[]) => {
+  return numbers_list.filter(n => n > lower_limit);
+} 
+
+
+const filterNumbersInRange = (lower_limit:number, greater_limit:number, numbers_list:string[]) =>{
+  let filterderList:string[];
+  filterderList = filterNumbersLowerThan(lower_limit, numbers_list)
+  filterderList = filterNumbersGreaterThan(greater_limit, filterderList)
+  return filterderList
+}
+
+
+const pushNegativesToList = (numbers_list:string[], warn_list:string[]) => {
+  for (const number of numbers_list) {
+    if (Number(number) < 0) {
+      warn_list.push(Number(number));
+    }
+  }
+}
+
+
+const throwNegativeErrorFromList = (numbers_list:string[]) =>{
+  const negatives = [];
+  pushNegativesToList(numbers_list, negatives);
+  if (negatives.length > 0) {
+    throw new Error('negatives not allowed: ' + negatives.join(', '));
+  }
+}
+
+
+const addNumberFromStringsList = (numbers_list:string[]) => {
+  let total:number = 0;
+  for (const number of numbers_list) {
+      total += Number(number);
+  }
+  return total;
+}
+
+
+const akeNumberStringListFromString = (numbers_string:string) => {
+  if (numbers_to_string.startsWith('//')) {
+      let deli = numbers_to_string.charAt(2);
+      let body = numbers_to_string.substring(4);
+
+    if (numbers_to_string.charAt(2) === '[') {
+      deli = numbers_to_string.substring(3, numbers_to_string.indexOf(']'));
+      body = numbers_to_string.substring(numbers_to_string.indexOf(']') + 2);
+    }
+
+    if (numbers_to_string.charAt(2) === '[' && numbers_to_string.indexOf('][') !== -1) {
+      const h = numbers_to_string.substring(2, numbers_to_string.indexOf(']\n') + 1);
+      body = numbers_to_string.substring(numbers_to_string.indexOf(']\n') + 2);
+      const declared = h.substring(1, h.length - 1).split('][');
+
+      for (const one of declared) {
+        body = body.split(one).join(',');
+      }
+
+      deli = ',';
+    }
+  }
 }
