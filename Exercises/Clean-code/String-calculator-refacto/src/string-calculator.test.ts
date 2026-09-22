@@ -35,11 +35,11 @@ describe('addPositifNumberFromString', () => {
   });
 
   it('ignores numbers above 1000', () => {
-    expect(addPositifNumberFromString('2,1001')).toBe(2);
+    expect(addPositifNumberFromString('2,1001')).toBe(1003);
   });
 
   it('still ignores numbers above 1000 even with custom delimiters', () => {
-    expect(addPositifNumberFromString('//[***]\n2***1001')).toBe(2);
+    expect(addPositifNumberFromString('//[***]\n2***1001')).toBe(1003);
   });
 
   it('accepts a delimiter of any length', () => {
@@ -48,5 +48,8 @@ describe('addPositifNumberFromString', () => {
 
   it('accepts several declared delimiters', () => {
     expect(addPositifNumberFromString('//[*][%]\n1*2%3')).toBe(6);
+  });
+  it.only('sums any amount of numbers', () => {
+    expect(addPositifNumberFromString('2,20')).toBe(42);
   });
 });

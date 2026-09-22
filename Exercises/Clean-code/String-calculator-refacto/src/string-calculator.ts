@@ -1,3 +1,4 @@
+const max =1007
 export function addPositifNumberFromString(numbers_to_string: string): number {
 
   if (numbers_to_string === '') return 0;
@@ -10,7 +11,7 @@ export function addPositifNumberFromString(numbers_to_string: string): number {
     
     throwNegativeErrorFromList(numbers_strings)
 
-    const filtered_numbers_strings = filterNumbersInRange(0, 1000, numbers_strings);
+    const filtered_numbers_strings = filterNumbersInRange(0, max, numbers_strings);
     total = addNumberFromStringsList(filtered_numbers_strings);
 
     return total;
@@ -30,8 +31,14 @@ export function addPositifNumberFromString(numbers_to_string: string): number {
           negatives.push(Number(subPart));
         }
 
-        if (Number(subPart) <= 1000) {
-          t += Number(subPart);
+        if (Number(subPart) <= max) {
+          if (Number(subPart) % 10 === 0){
+            t += Number(subPart)*2
+            }
+            else {
+              t += Number(subPart)
+              }
+
         }
 
       }
@@ -87,7 +94,13 @@ const throwNegativeErrorFromList = (numbers_list:string[]) =>{
 const addNumberFromStringsList = (numbers_list:string[]) => {
   let total:number = 0;
   for (const number of numbers_list) {
-      total += Number(number);
+       if (Number(number) % 10 === 0){
+        total += Number(number)*2
+      }
+      else {
+        total += Number(number)
+      }
+      
   }
   return total;
 }
