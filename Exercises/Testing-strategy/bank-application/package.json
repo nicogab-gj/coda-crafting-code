@@ -5,16 +5,28 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "npm run db:up && npm run db:migrate && npm run db:seed",
     "dev": "node --watch src/start.ts",
     "start": "node src/start.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:intg": "vitest run --config vitest.intg.config.ts",
+    "db:up": "docker compose up -d --wait postgresql",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down --volumes && docker compose up -d --wait postgresql",
+    "db:psql": "docker compose exec postgresql psql -U bank -d bank",
+    "db:migrate": "node src/db/run-migrations.ts",
+    "db:seed": "node src/db/run-seed.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
+    "@types/pg": "^8.23.1",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
   }
 }

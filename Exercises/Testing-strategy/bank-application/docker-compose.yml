@@ -1,0 +1,24 @@
+services:
+  postgresql:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: bank
+      POSTGRES_PASSWORD: bank
+      POSTGRES_DB: bank
+    ports:
+      # 5433 on the host so it does not collide with another local Postgres on 5432
+      - 5433:5432
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+      # Scripts here run once, when the data volume is first created
+      - ./src/db/init:/docker-entrypoint-initdb.d:ro
+    # Uncomment to log EVERY SQL query, useful for fine grained debugging:
+    # command: ['postgres', '-c', 'log_statement=all', '-c', 'log_destination=stderr']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bank -d bank']
+      interval: 1s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  postgresql-data:
