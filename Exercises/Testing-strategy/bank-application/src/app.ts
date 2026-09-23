@@ -1,32 +1,35 @@
-import { createServer, type Server, type ServerResponse } from 'node:http'
-import { getBalance } from './account-service.ts'
+import { createServer, type Server } from 'node:http'
+import type { AccountController } from './controllers/account-controller.ts'
+import { respondWithJson } from './http.ts'
 
 type Health = { status: 'ok'; uptimeInSeconds: number }
-type Balance = { balance: number }
 
-function createApp(): Server {
-  return createServer((request, response) => {
-    if (request.method === 'GET' && request.url === '/health') {
-      const health: Health = { status: 'ok', uptimeInSeconds: Math.floor(process.uptime()) }
+const ACCOUNT_BALANCE_PATH = /^\/accounts\/(\d+)\/balance$/
 
-      respondWithJson(response, 200, health)
-      return
+function createApp(accountController: AccountController): Server {
+  return createServer(async (request, response) => {
+    try {
+      if (request.method === 'GET' && request.url === '/health') {
+        const health: Health = { status: 'ok', uptimeInSeconds: Math.floor(process.uptime()) }
+
+        respondWithJson(response, 200, health)
+        return
+      }
+
+      const accountBalancePath = request.url?.match(ACCOUNT_BALANCE_PATH)
+      if (request.method === 'GET' && accountBalancePath?.[1] !== undefined) {
+        const { statusCode, body } = await accountController.getBalance(accountBalancePath[1])
+
+        respondWithJson(response, statusCode, body)
+        return
+      }
+
+      respondWithJson(response, 404, { error: 'Not found' })
+    } catch (error) {
+      console.error(error)
+      respondWithJson(response, 500, { error: 'Internal server error' })
     }
-
-    if (request.method === 'GET' && request.url === '/balance') {
-      const balance: Balance = { balance: getBalance() }
-
-      respondWithJson(response, 200, balance)
-      return
-    }
-
-    respondWithJson(response, 404, { error: 'Not found' })
   })
-}
-
-function respondWithJson(response: ServerResponse, statusCode: number, body: unknown): void {
-  response.writeHead(statusCode, { 'content-type': 'application/json' })
-  response.end(JSON.stringify(body))
 }
 
 export { createApp }
