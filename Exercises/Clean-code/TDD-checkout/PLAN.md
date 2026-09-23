@@ -1,61 +1,66 @@
-## Initial specs
+## Spécifications initiales
 
-A supermarket checkout totals a sequence of scanned items.
+Une caisse de supermarché totalise une séquence d'articles scannés.
 
-Items are identified by name. Each name has a unit price. Some items additionally carry a
-multi-buy offer: buy `n`, pay `y` for the group instead of `n × unit`.
+Les articles sont identifiés par leur nom. Chaque nom a un prix unitaire. Certains articles
+comportent en plus une offre multi-achat : achetez `n`, payez `y` pour le lot au lieu de
+`n × prix unitaire`.
 
-Reference price list (test data only, never hardcoded into production classes):
+Liste de prix de référence (données de test uniquement, jamais codées en dur dans les
+classes de production) :
 
-| Name    | Unit price | Offer     |
-| ------- | ---------- | --------- |
-| Apple   | 50         | 3 for 130 |
-| Carrot  | 30         | 2 for 45  |
-| Egg     | 20         | none      |
-| Yoghurt | 15         | none      |
+| Nom     | Prix unitaire | Offre        |
+| ------- | -------------- | ------------ |
+| Apple   | 50             | 3 pour 130   |
+| Carrot  | 30             | 2 pour 45    |
+| Egg     | 20             | aucune       |
+| Yoghurt | 15             | aucune       |
 
-Rules of the domain:
+Règles du domaine :
 
-- Items may be scanned in any order. Scanning `Carrot`, `Apple`, `Carrot` must still
-  recognize the pair of Carrots and price them at 45.
-- Offers apply greedily and repeatedly. Five Apples are two groups short of six, so they
-  price as one group of three (130) plus two singles (100), totalling 230.
-- Prices are integers in the smallest currency unit. **No floating point anywhere in the
-  money path.** If the language has a decimal or money type already in use in this repo,
-  prefer it.
-- Pricing changes frequently. Rules are supplied to a checkout when a transaction
-  starts; they are not compiled into it.
+- Les articles peuvent être scannés dans n'importe quel ordre. Scanner `Carrot`, `Apple`,
+  `Carrot` doit tout de même reconnaître la paire de Carottes et les facturer à 45.
+- Les offres s'appliquent de manière gloutonne et répétée. Cinq Pommes sont à deux
+  groupes de six. Elles sont donc facturées comme un groupe de trois (130) plus deux
+  unités (100), soit un total de 230.
+- Les prix sont des entiers exprimés dans la plus petite unité monétaire. **Aucun nombre
+  à virgule flottante dans le chemin monétaire.** Si le langage dispose déjà d'un type
+  décimal ou monétaire utilisé dans ce dépôt, privilégiez-le.
+- Les prix changent fréquemment. Les règles sont fournies à une caisse au démarrage
+  d'une transaction ; elles ne sont pas compilées dans celle-ci.
 
-## Public API
+## API publique
 
-Target shape, adapted to the repo's language idioms (naming case, error conventions,
-optionals vs exceptions):
+Forme cible, adaptée aux idiomes du langage du dépôt (casse de nommage, conventions
+d'erreurs, optionnels vs exceptions) :
 
 ```
-checkout.scan(name)          // records one scanned item
-checkout.total() -> integer // current total for everything scanned so far
+checkout.scan(name)          // enregistre un article scanné
+checkout.total() -> integer  // total actuel de tout ce qui a été scanné jusqu'ici
 ```
 
-`total()` is a query. Calling it twice in a row must return the same value and must not
-mutate anything.
+`total()` est une requête. L'appeler deux fois de suite doit renvoyer la même valeur et
+ne doit rien modifier.
 
-Scanning an unknown name is an error.
+Scanner un nom inconnu est une erreur.
 
-**Hard constraints, verify each one explicitly before closing this milestone:**
+**Contraintes strictes, à vérifier explicitement avant de clôturer ce jalon :**
 
-1. The `Checkout` type contains no name literal (`"Apple"`, `"Carrot"`, …) anywhere.
-2. The `Checkout` type contains no `if`/`switch` on offer type, and no `instanceof`-style
-   type test.
+1. Le type `Checkout` ne contient aucun littéral de nom (`"Apple"`, `"Carrot"`, …) où que
+   ce soit.
+2. Le type `Checkout` ne contient aucun `if`/`switch` sur le type d'offre, ni aucun test
+   de type de style `instanceof`.
 
-## Specs part 1: Basic Offers
+## Spécifications partie 1 : Offres de base
 
-1. Design a step by step plan to solve this in TDD
-2. Implement it step by step
-3. Think about design when needed.
+1. Concevoir un plan étape par étape pour résoudre cela en TDD
+2. L'implémenter étape par étape
+3. Réfléchir à la conception lorsque nécessaire.
 
-## Specs part 2: Advanced Offers
+## Spécifications partie 2 : Offres avancées
 
-1. Add a new item to the price list. It costs 10 units.
-2. **Cross-product offer.** Buy two Eggs, get 20% off all Yoghurts.
-3. **Basket-level discount.** 10% off the order when the subtotal exceeds 5000, applied
-   after all item-level discounts.
+1. Ajouter un nouvel article à la liste de prix. Il coûte 10 unités.
+2. **Offre croisée entre produits.** Achetez deux Œufs, obtenez 20 % de réduction sur
+   tous les Yaourts.
+3. **Remise au niveau du panier.** 10 % de réduction sur la commande lorsque le
+   sous-total dépasse 5000, appliquée après toutes les remises au niveau des articles.
