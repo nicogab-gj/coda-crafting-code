@@ -1,5 +1,5 @@
 import type pg from 'pg';
-import { AccountRepository } from '../interfaces/account-repository.ts';
+import { AccountRepository, type Account } from '../interfaces/account-repository.ts';
 
 class PostgresAccountRepository extends AccountRepository {
   private readonly pool: pg.Pool;
@@ -9,19 +9,20 @@ class PostgresAccountRepository extends AccountRepository {
     this.pool = pool;
   }
 
-  async getAmountById(accountId: number): Promise<number | undefined> {
+  async getAccountById(accountId: number): Promise<Account | undefined> {
     // pg returns numeric as a string ('1234.5600') to avoid losing precision
-    const result = await this.pool.query<{ amount: string }>('SELECT amount FROM account WHERE id = $1', [accountId]);
+    const result = await this.pool.query<{ amount: string; user_id: string }>(
+      'SELECT amount, user_id FROM account WHERE id = $1',
+      [accountId],
+    );
     const row = result.rows[0];
 
-    return row === undefined ? undefined : Number(row.amount);
-  }
-
-  async getUserIdById(accountId: number): Promise<number | undefined> {
-    const result = await this.pool.query<{ user_id: string }>('SELECT user_id FROM account WHERE id = $1', [accountId]);
-    const row = result.rows[0];
-
-    return row === undefined ? undefined : Number(row.user_id);
+    return row === undefined
+      ? undefined
+      : {
+          balance: Number(row.amount),
+          userId: Number(row.user_id),
+        };
   }
 }
 

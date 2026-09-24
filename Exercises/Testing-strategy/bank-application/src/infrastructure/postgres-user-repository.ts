@@ -1,5 +1,5 @@
 import type pg from 'pg';
-import { UserRepository } from '../interfaces/user-repository.ts';
+import { UserRepository, type User } from '../interfaces/user-repository.ts';
 
 class PostgresUserRepository extends UserRepository {
   private readonly pool: pg.Pool;
@@ -9,13 +9,15 @@ class PostgresUserRepository extends UserRepository {
     this.pool = pool;
   }
 
-  async getNameById(userId: number): Promise<{ firstname: string; lastname: string } | undefined> {
+  async getNamesById(userId: number): Promise<User | undefined> {
     const result = await this.pool.query<{ firstname: string; lastname: string }>(
-      'SELECT firstname, lastname FROM users WHERE id = $1',
+      'SELECT firstname, lastname FROM users WHERE id=$1',
       [userId],
     );
 
-    return result.rows[0];
+    const row = result.rows[0];
+
+    return row ? { firstName: row.firstname, lastName: row.lastname } : undefined;
   }
 }
 

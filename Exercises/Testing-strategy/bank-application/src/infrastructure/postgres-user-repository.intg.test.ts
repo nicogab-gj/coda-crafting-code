@@ -1,34 +1,38 @@
 import type pg from 'pg';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import type { UserRepository } from '../interfaces/user-repository.ts';
-import { PostgresUserRepository } from './postgres-user-repository.ts';
-import { createPool } from '../db/database.ts';
-import { truncateAllTables, insertUser } from '../test/database-fixtures.ts';
+import { createPool } from '../db/database';
+import { insertUser, truncateAllTables } from '../test/database-fixtures';
+import type { User, UserRepository } from '../interfaces/user-repository';
+import { PostgresUserRepository } from './postgres-user-repository';
 
-let pool: pg.Pool;
-let userRepository: UserRepository;
+describe('User repository', () => {
+  let pool: pg.Pool;
+  let userRepository: UserRepository;
 
-beforeAll(() => {
-  pool = createPool();
-  userRepository = new PostgresUserRepository(pool);
-});
-
-afterEach(async () => {
-  await truncateAllTables(pool);
-});
-
-afterAll(async () => {
-  await pool.end();
-});
-
-describe('PostgresUserRepository.getNameById', () => {
-  it('returns the firstname and lastname of the user', async () => {
-    const userId = await insertUser(pool);
-
-    expect(await userRepository.getNameById(userId)).toEqual({ firstname: 'Ada', lastname: 'Lovelace' });
+  beforeAll(() => {
+    pool = createPool();
+    userRepository = new PostgresUserRepository(pool);
   });
 
-  it('returns undefined when the user does not exist', async () => {
-    expect(await userRepository.getNameById(999)).toBeUndefined();
+  afterEach(async () => {
+    await truncateAllTables(pool);
+  });
+
+  afterAll(async () => {
+    await pool.end();
+  });
+
+  it('returns undefined if user is not found', async () => {
+    const user = await userRepository.getNamesById(1);
+    expect(user).toBeUndefined();
+  });
+
+  it('returns the requested user', async () => {
+    const userId = await insertUser(pool);
+
+    const user = await userRepository.getNamesById(userId);
+    expect(user).toEqual<User>({
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+    });
   });
 });

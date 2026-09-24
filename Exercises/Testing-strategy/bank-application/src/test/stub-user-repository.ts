@@ -1,18 +1,13 @@
-import { UserRepository } from '../interfaces/user-repository.ts';
+import { UserRepository, type User } from '../interfaces/user-repository';
 
-class StubUserRepository extends UserRepository {
-    private readonly nameById: Record<number, { firstname: string; lastname: string; }>;
+export class StubUserRepository extends UserRepository {
+  usersById: Record<number, User>;
+  constructor(usersById: Record<number, User>) {
+    super();
+    this.usersById = usersById;
+  }
 
-    constructor(
-        nameById: Record<number, { firstname: string; lastname: string; }> = {},
-    ) {
-        super();
-        this.nameById = nameById;
-    }
-
-    async getNameById(userId: number): Promise<{ firstname: string; lastname: string; } | undefined> {
-        return this.nameById[userId];
-    }
+  async getNamesById(userId: number): Promise<User | undefined> {
+    return this.usersById[userId];
+  }
 }
-
-export { StubUserRepository };

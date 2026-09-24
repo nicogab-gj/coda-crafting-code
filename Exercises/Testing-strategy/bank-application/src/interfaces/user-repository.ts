@@ -1,6 +1,11 @@
+type User = {
+  firstName: string;
+  lastName: string;
+};
 abstract class UserRepository {
-
-  abstract getNameById(userId: number): Promise<{ firstname: string; lastname: string } | undefined>
-  
+  abstract getNamesById(userId: number): Promise<User | undefined>;
 }
-export { UserRepository }
+
+export { UserRepository };
+
+export type { User };

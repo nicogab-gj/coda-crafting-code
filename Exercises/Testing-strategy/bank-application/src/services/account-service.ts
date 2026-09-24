@@ -1,4 +1,4 @@
-import type { AccountRepository } from '../interfaces/account-repository.ts';
+import type { Account, AccountRepository } from '../interfaces/account-repository.ts';
 import type { UserRepository } from '../interfaces/user-repository.ts';
 
 class AccountNotFoundError extends Error {
@@ -7,6 +7,19 @@ class AccountNotFoundError extends Error {
     this.name = 'AccountNotFoundError';
   }
 }
+
+class UserNotFoundError extends Error {
+  constructor(userId: number) {
+    super(`User ${userId} not found`);
+    this.name = 'UserNotFoundError';
+  }
+}
+
+export type AccountInfo = {
+  balance: number;
+  firstName: string;
+  lastName: string;
+};
 
 class AccountService {
   private readonly accountRepository: AccountRepository;
@@ -17,20 +30,31 @@ class AccountService {
     this.userRepository = userRepository;
   }
 
-  async getBalance(accountId: number): Promise<number> {
-    const amount = await this.accountRepository.getAmountById(accountId);
-    if (amount === undefined) throw new AccountNotFoundError(accountId);
+  async getAccountInfo(accountId: number): Promise<AccountInfo> {
+    const account = await this.retrieveAccountAndThrowIfNotFound(accountId);
 
-    return amount;
+    const user = await this.retrieveUserAndThrowIfNotFound(account);
+
+    return {
+      balance: account.balance,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
   }
 
-  async getOwner(accountId: number): Promise<{ firstname: string; lastname: string } | undefined> {
-    const userId = await this.accountRepository.getUserIdById(accountId);
-    if (userId === undefined) throw new AccountNotFoundError(accountId);
-    {
-      return this.userRepository.getNameById(userId);
+  private async retrieveUserAndThrowIfNotFound(account: Account) {
+    const user = await this.userRepository.getNamesById(account.userId);
+    if (user === undefined) {
+      throw new UserNotFoundError(account.userId);
     }
+    return user;
+  }
+
+  private async retrieveAccountAndThrowIfNotFound(accountId: number): Promise<Account> {
+    const account = await this.accountRepository.getAccountById(accountId);
+    if (account === undefined) throw new AccountNotFoundError(accountId);
+    return account;
   }
 }
 
-export { AccountNotFoundError, AccountService };
+export { AccountNotFoundError, UserNotFoundError, AccountService };
