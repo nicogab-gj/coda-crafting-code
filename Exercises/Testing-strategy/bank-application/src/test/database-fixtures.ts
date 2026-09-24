@@ -4,10 +4,11 @@ async function truncateAllTables(pool: pg.Pool): Promise<void> {
   await pool.query('TRUNCATE account_history, account, users RESTART IDENTITY')
 }
 
-async function insertUser(pool: pg.Pool): Promise<number> {
+async function insertUser(pool: pg.Pool, firstname = 'Ada', lastname = 'Lovelace'): Promise<number> {
   const result = await pool.query<{ id: string }>(
     `INSERT INTO users (firstname, lastname, birthdate, country_of_residence)
-     VALUES ('Ada', 'Lovelace', '1815-12-10', 'GB') RETURNING id`,
+     VALUES ($1, $2, '1815-12-10', 'GB') RETURNING id`,
+    [firstname, lastname],
   )
 
   return Number(result.rows[0]?.id)

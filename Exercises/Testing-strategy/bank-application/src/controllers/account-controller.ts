@@ -29,6 +29,20 @@ class AccountController {
       return { statusCode: 404, body: { error: 'Account not found' } }
     }
   }
+  async getAccountName(accountId: string): Promise<HttpResponse> {
+    if (accountId.length > MAX_ACCOUNT_ID_LENGTH) {
+      return { statusCode: 400, body: { error: 'Invalid account id' } }
+    }
+    try {
+      const name = await this.accountService.getAccountName(Number(accountId))
+
+      return {statusCode: 200,body: name}
+    }catch (error) {
+      if (!(error instanceof AccountNotFoundError)) throw error
+
+      return { statusCode: 404, body: { error: 'Account not found' } }
+    }
+  }
 }
 
 export { AccountController }

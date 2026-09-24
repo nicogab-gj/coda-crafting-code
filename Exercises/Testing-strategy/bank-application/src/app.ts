@@ -5,6 +5,7 @@ import { respondWithJson } from './http.ts'
 type Health = { status: 'ok'; uptimeInSeconds: number }
 
 const ACCOUNT_BALANCE_PATH = /^\/accounts\/(\d+)\/balance$/
+const ACCOUNT_NAME_PATH = /^\/accounts\/(\d+)\/name$/
 
 function createApp(accountController: AccountController): Server {
   return createServer(async (request, response) => {
@@ -20,6 +21,12 @@ function createApp(accountController: AccountController): Server {
       if (request.method === 'GET' && accountBalancePath?.[1] !== undefined) {
         const { statusCode, body } = await accountController.getBalance(accountBalancePath[1])
 
+        respondWithJson(response, statusCode, body)
+        return
+      }
+      const accountNamePath = request.url?.match(ACCOUNT_NAME_PATH)
+      if (request.method === 'GET' && accountNamePath?.[1] !== undefined) {
+        const { statusCode, body } = await accountController.getAccountName(accountNamePath[1])
         respondWithJson(response, statusCode, body)
         return
       }

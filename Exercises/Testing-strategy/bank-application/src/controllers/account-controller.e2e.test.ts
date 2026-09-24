@@ -58,7 +58,6 @@ function readListeningUrl(childProcess: ChildProcess): Promise<string> {
 describe('AccountController: GET /accounts/:id/balance', () => {
   it('serves the account balance from the database through a real server process', async () => {
     const accountId = await insertAccount(pool, await insertUser(pool), 1234.56)
-
     const response = await fetch(`${baseUrl}/accounts/${accountId}/balance`)
 
     expect(response.status).toBe(200)
@@ -75,7 +74,6 @@ describe('AccountController: GET /accounts/:id/balance', () => {
 
   it('responds with 404 when the id is not a number', async () => {
     const response = await fetch(`${baseUrl}/accounts/abc/balance`)
-
     expect(response.status).toBe(404)
     expect(await response.json()).toEqual({ error: 'Not found' })
   })

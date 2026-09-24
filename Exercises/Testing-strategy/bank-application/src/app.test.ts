@@ -5,6 +5,7 @@ import { AccountService } from './services/account-service.ts';
 import { createApp } from './app.ts';
 import { AccountController } from './controllers/account-controller.ts';
 import { StubAccountRepository } from './test/stub-account-repository.ts';
+import { StubUserRepository } from './test/stub-user-repository.ts';
 
 class FailingAccountRepository extends AccountRepository {
   async getAmountById(): Promise<number | undefined> {
@@ -13,7 +14,7 @@ class FailingAccountRepository extends AccountRepository {
 }
 
 async function startServer(accountRepository: AccountRepository): Promise<{ server: Server; baseUrl: string }> {
-  const server = createApp(new AccountController(new AccountService(accountRepository)));
+  const server = createApp(new AccountController(new AccountService(accountRepository , new StubUserRepository())));
   await new Promise<void>(resolve => server.listen(0, resolve));
 
   const address = server.address();

@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { AccountService } from '../services/account-service.ts'
 import { StubAccountRepository } from '../test/stub-account-repository.ts'
+import { StubUserRepository } from '../test/stub-user-repository.ts'
 import { AccountController } from './account-controller.ts'
 
 function createController(amountsById: Record<number, number>): AccountController {
-  return new AccountController(new AccountService(new StubAccountRepository(amountsById)))
+  return new AccountController(new AccountService(new StubAccountRepository(amountsById), new StubUserRepository()))
 }
 
 describe('AccountController.getBalance', () => {
