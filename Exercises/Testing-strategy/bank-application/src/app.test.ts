@@ -10,6 +10,9 @@ class FailingAccountRepository extends AccountRepository {
   async getAmountById(): Promise<number | undefined> {
     throw new Error('database is down');
   }
+  async getUserIdById(): Promise<number | undefined> {
+    throw new Error('database is down');
+  }
 }
 
 async function startServer(accountRepository: AccountRepository): Promise<{ server: Server; baseUrl: string }> {

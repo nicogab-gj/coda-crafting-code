@@ -32,3 +32,16 @@ describe('PostgresAccountRepository.getAmountById', () => {
     expect(await accountRepository.getAmountById(999)).toBeUndefined();
   });
 });
+
+describe('PostgresAccountRepository.getUserIdById', () => {
+  it('returns the id of the user who owns the account', async () => {
+    const userId = await insertUser(pool)
+    const accountId = await insertAccount(pool, userId);
+    expect(await accountRepository.getUserIdById(accountId)).toBe(userId);
+  })
+
+  it('returns undefined when the account does not exist', async () => {
+    expect(await accountRepository.getUserIdById(999)).toBeUndefined();
+  });
+
+})

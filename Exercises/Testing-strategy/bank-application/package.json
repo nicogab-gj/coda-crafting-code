@@ -13,6 +13,7 @@
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "typecheck": "tsc --noEmit",
     "test:intg": "vitest run --config vitest.intg.config.ts",
+    "test:intg:watch": "vitest --config vitest.intg.config.ts",
     "db:up": "docker compose up -d --wait postgresql",
     "db:down": "docker compose down",
     "db:reset": "docker compose down --volumes && docker compose up -d --wait postgresql",

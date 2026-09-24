@@ -2,6 +2,7 @@
 abstract class AccountRepository {
   // Resolves to undefined when the account does not exist
   abstract getAmountById(accountId: number): Promise<number | undefined>
+  abstract getUserIdById(accountId: number): Promise<number | undefined>
 }
 
 export { AccountRepository }
