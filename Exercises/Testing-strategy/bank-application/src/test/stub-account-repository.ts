@@ -6,8 +6,8 @@ import type { Account } from '../types/account-type.ts';
 
 
 class StubAccountRepository extends AccountRepository {
-  private readonly accountById: ReadonlyMap<number, Account>;
 
+  private readonly accountById: ReadonlyMap<number, Account>;
 
   constructor(accountById: Record<number, Account> = {}, ) {
     super();
@@ -21,6 +21,7 @@ class StubAccountRepository extends AccountRepository {
   async getUserIdById(accountId: number): Promise<number | undefined> {
     return this.accountById.get(accountId)?.userId;
   }
+
 }
 
 export { StubAccountRepository };
