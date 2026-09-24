@@ -4,13 +4,18 @@ import type { AccountRepository } from '../interfaces/account-repository.ts';
 import { PostgresAccountRepository } from './postgres-account-repository.ts';
 import { createPool } from '../db/database.ts';
 import { truncateAllTables, insertAccount, insertUser } from '../test/database-fixtures.ts';
+import type { UserRepository } from '../interfaces/user-repository.ts';
+import { PostgresUserRepository } from './postgres-user-repository.ts';
+
 
 let pool: pg.Pool;
 let accountRepository: AccountRepository;
+let userRepository: UserRepository;
 
 beforeAll(() => {
   pool = createPool();
   accountRepository = new PostgresAccountRepository(pool);
+  userRepository = new PostgresUserRepository(pool);
 });
 
 afterEach(async () => {
@@ -31,4 +36,9 @@ describe('PostgresAccountRepository.getAmountById', () => {
   it('returns undefined when the account does not exist', async () => {
     expect(await accountRepository.getAmountById(999)).toBeUndefined();
   });
+
+  it('test get amount by acountid', async () => {
+    expect(await accountRepository.getAmountById(1)).toBe(1000.00);
+  });
+
 });

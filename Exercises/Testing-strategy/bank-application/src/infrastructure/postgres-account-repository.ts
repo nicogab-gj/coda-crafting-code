@@ -16,6 +16,16 @@ class PostgresAccountRepository extends AccountRepository {
 
     return row === undefined ? undefined : Number(row.amount);
   }
+
+  
+  async getUserIdById(accountId: number): Promise<number | undefined> {
+    // pg returns numeric as a string ('1234.5600') to avoid losing precision
+    const result = await this.pool.query<{ user_id: string }>('SELECT user_id FROM account WHERE id = $1', [accountId]);
+    const row = result.rows[0];
+
+    return row === undefined ? undefined : Number(row.user_id);
+  }
+  
 }
 
 export { PostgresAccountRepository };
