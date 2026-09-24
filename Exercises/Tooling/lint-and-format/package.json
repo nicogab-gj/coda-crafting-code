@@ -1,0 +1,20 @@
+{
+  "name": "lint-and-format",
+  "version": "1.0.0",
+  "description": "Set up, tune and extend ESLint + Prettier on a TypeScript project",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
