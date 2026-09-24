@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { addLine, createOrder, isExpired, placeOrder, total } from './order.js'
 
 const book = { sku: 'BOOK', unitPrice: 12, quantity: 2 }
-const pen = { sku: "PEN", unitPrice: 1.5, quantity: 4 }
+const pen = { sku: 'PEN', unitPrice: 1.5, quantity: 4 }
 
 describe('order', () => {
   it('starts as an empty draft', () => {
