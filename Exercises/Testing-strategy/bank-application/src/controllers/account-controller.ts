@@ -1,16 +1,15 @@
-import { AccountNotFoundError, type AccountService } from '../services/account-service.ts'
+import type { AccountInformationProvider } from '../interfaces/account-information-provider.ts'
+import { AccountNotFoundError } from '../services/account-service.ts'
 import type { HttpResponse } from '../http.ts'
-
-type Balance = { balance: number }
 
 // Longer ids would lose precision once turned into a number, or overflow the database bigint
 const MAX_ACCOUNT_ID_LENGTH = 9
 
 class AccountController {
-  private readonly accountService: AccountService
+  private readonly accountInformationProvider: AccountInformationProvider
 
-  constructor(accountService: AccountService) {
-    this.accountService = accountService
+  constructor(accountInformationProvider: AccountInformationProvider) {
+    this.accountInformationProvider = accountInformationProvider
   }
 
   // GET /accounts/:id/balance
@@ -20,9 +19,9 @@ class AccountController {
     }
 
     try {
-      const balance: Balance = { balance: await this.accountService.getBalance(Number(accountId)) }
+      const accountInformation = await this.accountInformationProvider.getAccountInformation(Number(accountId))
 
-      return { statusCode: 200, body: balance }
+      return { statusCode: 200, body: accountInformation }
     } catch (error) {
       if (!(error instanceof AccountNotFoundError)) throw error
 

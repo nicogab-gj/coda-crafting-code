@@ -1,19 +1,18 @@
 import type { Server } from 'node:http';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { AccountRepository } from './interfaces/account-repository.ts';
-import { AccountService } from './services/account-service.ts';
+import { AccountInformationProvider, type AccountInformation } from './interfaces/account-information-provider.ts';
 import { createApp } from './app.ts';
 import { AccountController } from './controllers/account-controller.ts';
-import { StubAccountRepository } from './test/stub-account-repository.ts';
+import { StubAccountInformationProvider } from './test/stub-account-information-provider.ts';
 
-class FailingAccountRepository extends AccountRepository {
-  async getAmountById(): Promise<number | undefined> {
+class FailingAccountInformationProvider extends AccountInformationProvider {
+  async getAccountInformation(): Promise<AccountInformation> {
     throw new Error('database is down');
   }
 }
 
-async function startServer(accountRepository: AccountRepository): Promise<{ server: Server; baseUrl: string }> {
-  const server = createApp(new AccountController(new AccountService(accountRepository)));
+async function startServer(accountInformationProvider: AccountInformationProvider): Promise<{ server: Server; baseUrl: string }> {
+  const server = createApp(new AccountController(accountInformationProvider));
   await new Promise<void>(resolve => server.listen(0, resolve));
 
   const address = server.address();
@@ -34,7 +33,7 @@ let server: Server;
 let baseUrl: string;
 
 beforeAll(async () => {
-  ({ server, baseUrl } = await startServer(new StubAccountRepository()));
+  ({ server, baseUrl } = await startServer(new StubAccountInformationProvider()));
 });
 
 afterAll(async () => {
@@ -60,7 +59,7 @@ describe('unknown routes', () => {
 
 describe('unexpected errors', () => {
   it('responds with 500 when the balance cannot be read', async () => {
-    const failing = await startServer(new FailingAccountRepository());
+    const failing = await startServer(new FailingAccountInformationProvider());
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     try {

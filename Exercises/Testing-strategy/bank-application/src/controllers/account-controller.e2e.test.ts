@@ -56,14 +56,14 @@ function readListeningUrl(childProcess: ChildProcess): Promise<string> {
 }
 
 describe('AccountController: GET /accounts/:id/balance', () => {
-  it('serves the account balance from the database through a real server process', async () => {
+  it('serves the account balance and its holder name from the database through a real server process', async () => {
     const accountId = await insertAccount(pool, await insertUser(pool), 1234.56)
 
     const response = await fetch(`${baseUrl}/accounts/${accountId}/balance`)
 
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('application/json')
-    expect(await response.json()).toEqual({ balance: 1234.56 })
+    expect(await response.json()).toEqual({ balance: 1234.56, firstname: 'Ada', lastname: 'Lovelace' })
   })
 
   it('responds with 404 when the account does not exist', async () => {
